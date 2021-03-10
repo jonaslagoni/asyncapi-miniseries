@@ -1,0 +1,136 @@
+asyncapi: 2.0.0
+info: 
+  title: "Processor"
+  version: "0.0.1"  
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0
+defaultContentType: application/json
+channels: 
+  game/server/{serverId}/events/player/{playerId}/item/{itemId}/pickup:
+    description: Topic used when a player picks up an item in-game
+    parameters:
+      serverId: 
+        $ref: "#/components/parameters/serverId"
+      playerId: 
+        $ref: "#/components/parameters/playerId"
+      itemId: 
+        $ref: "#/components/parameters/itemId"
+    publish: 
+      message:
+        $ref: '#/components/messages/playerItemPickup'
+  game/server/{serverId}/events/player/{playerId}/connect:
+    description: Topic used when a player joins (connect to) the game server
+    parameters:
+      serverId: 
+        $ref: "#/components/parameters/serverId"
+      playerId: 
+        $ref: "#/components/parameters/playerId"
+    publish: 
+      message:
+        $ref: '#/components/messages/playerConnected'
+  game/server/{serverId}/events/player/{playerId}/disconnect:
+    description: Topic used when a player leaves (disconnects from) the game server
+    parameters:
+      serverId: 
+        $ref: "#/components/parameters/serverId"
+      playerId: 
+        $ref: "#/components/parameters/playerId"
+    publish: 
+      message:
+        $ref: '#/components/messages/playerDisconnected'
+  game/server/{serverId}/events/player/{playerId}/chat: 
+    description: Topic used when a player writes something in chat
+    parameters:
+      serverId: 
+        $ref: "#/components/parameters/serverId"
+      playerId: 
+        $ref: "#/components/parameters/playerId"
+    publish: 
+      message:
+        $ref: '#/components/messages/playerUsedChat'
+  game/server/{serverId}/events/player/{playerId}/hit: 
+    description: Topic used when a player hit another player in-game
+    parameters:
+      serverId: 
+        $ref: "#/components/parameters/serverId"
+      playerId: 
+        $ref: "#/components/parameters/playerId"
+    publish: 
+      message:
+        $ref: '#/components/messages/playerHit'
+components:
+  messages:
+    playerItemPickup: 
+      payload:
+        $ref: '#/components/schemas/playerItemPickupPayload'
+    playerConnected: 
+      payload:
+        $ref: '#/components/schemas/playerConnectedPayload'
+    playerDisconnected: 
+      payload:
+        $ref: '#/components/schemas/playerDisconnectedPayload'
+    playerUsedChat: 
+      payload:
+        $ref: '#/components/schemas/playerUsedChatPayload'
+    playerHit: 
+      payload:
+        $ref: '#/components/schemas/playerHitPayload'
+  schemas:
+    playerItemPickupPayload:
+      type: object
+      properties:
+        pickupTimestamp:     
+          type: string
+          format: date-time
+          description: The timestamp the item was picked up
+    playerConnectedPayload:
+      type: object
+      properties:
+        connectTimestamp:
+          type: string
+          format: date-time
+          description: The timestamp the player connected to the game server
+    playerDisconnectedPayload:
+      type: object
+      properties:
+        disconnectTimestamp:
+          type: string
+          format: date-time
+          description: The timestamp the player disconnected from the game server
+    playerUsedChatPayload:
+      type: object
+      properties:
+        chatTimestamp:
+          type: string
+          format: date-time
+          description: The timestamp the player send the message in-game
+        message:
+          type: string
+          description: The message the player send
+    playerHitPayload:
+      type: object
+      properties:
+        hitTimestamp:
+          type: string
+          format: date-time
+          description: The timestamp of the hit
+        target:
+          type: string
+          description: The id of the player who got hit
+        damage: 
+          type: number
+          description: The damage given to the target
+  parameters:
+    serverId:
+        description: The id of the server
+        schema: 
+          type: string
+    playerId:
+        description: The id of the player who performed the action
+        schema: 
+          type: string
+    itemId:
+        description: The id of item
+        schema: 
+          type: integer
