@@ -3,7 +3,8 @@
   "version": "0.0.1",
   "description": "",
   "scripts": {
-    "run": "node index.js"
+    "start": "node index.js",
+    "setup:database": "node setupDatabase.js"
   },
   "dependencies": {
     "GeneratedClient": "file:./GeneratedClient",

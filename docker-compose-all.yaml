@@ -4,12 +4,12 @@ services:
     image : mongo
     volumes:
       - mongodb_data_container:/data/db
-    ports:
-      - 27017:27017
     restart: unless-stopped
   nats:
     image: nats
-    ports:
-      - 8222:8222
+  processor:
+    build: "./Processor"
+  game-server:
+    build: "./Game server"
 volumes:
   mongodb_data_container:
