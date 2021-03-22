@@ -2,11 +2,14 @@
 import {NatsAsyncApiClient} from 'GeneratedClient/lib/';
 const MongoClient = require('mongodb').MongoClient;
 const Config = require('./config');
-var url = `mongodb://${Config.mongodbHost}`;
+var mongodbUrl = `mongodb://${Config.mongodbHost}`;
+const natsClient = new NatsAsyncApiClient();
+natsClient.connectToHost(Config.natsHost);
 
-const client = new NatsAsyncApiClient();
-client.connectToHost(Config.natsHost);
-client.subscribeToGameServerServerIdEventsPlayerPlayerIdChat(async (err, msg, serverId, playerId) => {
+/**
+ * Subscribe to to all chat events regardless of which server and player it is from
+ */
+natsClient.subscribeToGameServerServerIdEventsPlayerPlayerIdChat(async (err, msg, serverId, playerId) => {
     if(err){
         console.log(err);
         return;
@@ -15,7 +18,7 @@ client.subscribeToGameServerServerIdEventsPlayerPlayerIdChat(async (err, msg, se
     console.log(`${persistentLogId}: got message ${JSON.stringify(msg)}, with parameters serverId: ${serverId}, playerId: ${playerId}`);
     const saveMessage = {...msg, serverId, playerId};
     try{
-        const db = await MongoClient.connect(url);
+        const db = await MongoClient.connect(mongodbUrl);
         var dbo = db.db(Config.mongodbDatabase);
         await dbo.collection(Config.mongodbChatCollection).insertOne(saveMessage);
         db.close();
@@ -24,7 +27,11 @@ client.subscribeToGameServerServerIdEventsPlayerPlayerIdChat(async (err, msg, se
         console.error(`${persistentLogId}: Could not insert chat message`);
     }
 }, "*", "*"); 
-client.subscribeToGameServerServerIdEventsPlayerPlayerIdConnect((err, msg, serverId, playerId) => {
+
+/**
+ * Subscribe to to all player connection events regardless of which server and player it is from
+ */
+natsClient.subscribeToGameServerServerIdEventsPlayerPlayerIdConnect((err, msg, serverId, playerId) => {
     if(err){
         console.log(err);
         return;
@@ -33,7 +40,7 @@ client.subscribeToGameServerServerIdEventsPlayerPlayerIdConnect((err, msg, serve
     console.log(`${persistentLogId}: got message ${JSON.stringify(msg)}, with parameters serverId: ${serverId}, playerId: ${playerId}`);
     const saveMessage = {...msg, serverId, playerId};
     try{
-        const db = await MongoClient.connect(url);
+        const db = await MongoClient.connect(mongodbUrl);
         var dbo = db.db(Config.mongodbDatabase);
         await dbo.collection(Config.mongodbConnectionCollection).insertOne(saveMessage);
         db.close();
@@ -42,7 +49,11 @@ client.subscribeToGameServerServerIdEventsPlayerPlayerIdConnect((err, msg, serve
         console.error(`${persistentLogId}: Could not insert chat message`);
     }
 }, "*", "*");
-client.subscribeToGameServerServerIdEventsPlayerPlayerIdDisconnect((err, msg, serverId, playerId) => {
+
+/**
+ * Subscribe to to all player disconnection events regardless of which server and player it is from
+ */
+natsClient.subscribeToGameServerServerIdEventsPlayerPlayerIdDisconnect((err, msg, serverId, playerId) => {
     if(err){
         console.log(err);
         return;
@@ -51,7 +62,7 @@ client.subscribeToGameServerServerIdEventsPlayerPlayerIdDisconnect((err, msg, se
     console.log(`${persistentLogId}: got message ${JSON.stringify(msg)}, with parameters serverId: ${serverId}, playerId: ${playerId}`);
     const saveMessage = {...msg, serverId, playerId};
     try{
-        const db = await MongoClient.connect(url);
+        const db = await MongoClient.connect(mongodbUrl);
         var dbo = db.db(Config.mongodbDatabase);
         await dbo.collection(Config.mongodbDisconnectsCollection).insertOne(saveMessage);
         db.close();
@@ -60,7 +71,11 @@ client.subscribeToGameServerServerIdEventsPlayerPlayerIdDisconnect((err, msg, se
         console.error(`${persistentLogId}: Could not insert chat message`);
     }
 }, "*", "*");
-client.subscribeToGameServerServerIdEventsPlayerPlayerIdHit((err, msg, serverId, playerId) => {
+
+/**
+ * Subscribe to to all player on player hit events regardless of which server and player it is from
+ */
+natsClient.subscribeToGameServerServerIdEventsPlayerPlayerIdHit((err, msg, serverId, playerId) => {
     if(err){
         console.log(err);
         return;
@@ -69,7 +84,7 @@ client.subscribeToGameServerServerIdEventsPlayerPlayerIdHit((err, msg, serverId,
     console.log(`${persistentLogId}: got message ${JSON.stringify(msg)}, with parameters serverId: ${serverId}, playerId: ${playerId}`);
     const saveMessage = {...msg, serverId, playerId};
     try{
-        const db = await MongoClient.connect(url);
+        const db = await MongoClient.connect(mongodbUrl);
         var dbo = db.db(Config.mongodbDatabase);
         await dbo.collection(Config.mongodbPlayerHitCollection).insertOne(saveMessage);
         db.close();
@@ -78,7 +93,11 @@ client.subscribeToGameServerServerIdEventsPlayerPlayerIdHit((err, msg, serverId,
         console.error(`${persistentLogId}: Could not insert chat message`);
     }
 }, "*", "*");
-client.subscribeToGameServerServerIdEventsPlayerPlayerIdItemItemIdPickup((err, msg, serverId, playerId, itemId) => {
+
+/**
+ * Subscribe to to all player item pickup events regardless of which server and player it is from
+ */
+natsClient.subscribeToGameServerServerIdEventsPlayerPlayerIdItemItemIdPickup((err, msg, serverId, playerId, itemId) => {
     if(err){
         console.log(err);
         return;
@@ -87,7 +106,7 @@ client.subscribeToGameServerServerIdEventsPlayerPlayerIdItemItemIdPickup((err, m
     console.log(`${persistentLogId}: got message ${JSON.stringify(msg)}, with parameters serverId: ${serverId}, playerId: ${playerId}, itemId: ${itemId}`);
     const saveMessage = {...msg, serverId, playerId, itemId};
     try{
-        const db = await MongoClient.connect(url);
+        const db = await MongoClient.connect(mongodbUrl);
         var dbo = db.db(Config.mongodbDatabase);
         await dbo.collection(Config.mongodbDisconnectsCollection).insertOne(saveMessage);
         db.close();
