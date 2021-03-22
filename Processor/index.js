@@ -5,7 +5,7 @@ const Config = require('./config');
 var url = `mongodb://${Config.mongodbHost}`;
 
 const client = new NatsAsyncApiClient();
-client.connectToHost('localhost:8444');
+client.connectToHost(Config.natsHost);
 client.subscribeToGameServerServerIdEventsPlayerPlayerIdChat(async (err, msg, serverId, playerId) => {
     if(err){
         console.log(err);
