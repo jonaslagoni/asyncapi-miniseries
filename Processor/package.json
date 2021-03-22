@@ -7,7 +7,8 @@
   },
   "dependencies": {
     "GeneratedClient": "file:./GeneratedClient",
-    "mongodb": "^3.6.5"
+    "mongodb": "^3.6.5",
+    "uuid": "^8.3.2"
   },
   "author": "Jonas Lagoni (jonas-lt@live.dk)"
 }

@@ -1,5 +1,6 @@
 
 import {NatsAsyncApiClient} from 'GeneratedClient/lib/';
+const { v4: uuidv4 } = require('uuid');
 const MongoClient = require('mongodb').MongoClient;
 const Config = require('./config');
 var mongodbUrl = `mongodb://${Config.mongodbHost}`;
@@ -14,7 +15,7 @@ natsClient.subscribeToGameServerServerIdEventsPlayerPlayerIdChat(async (err, msg
         console.log(err);
         return;
     }
-    const persistentLogId = `PlayerChat-${uuidv4}`;
+    const persistentLogId = `PlayerChat-${uuidv4()}`;
     console.log(`${persistentLogId}: got message ${JSON.stringify(msg)}, with parameters serverId: ${serverId}, playerId: ${playerId}`);
     const saveMessage = {...msg, serverId, playerId};
     try{
@@ -36,7 +37,7 @@ natsClient.subscribeToGameServerServerIdEventsPlayerPlayerIdConnect((err, msg, s
         console.log(err);
         return;
     }
-    const persistentLogId = `PlayerConnected-${uuidv4}`;
+    const persistentLogId = `PlayerConnected-${uuidv4()}`;
     console.log(`${persistentLogId}: got message ${JSON.stringify(msg)}, with parameters serverId: ${serverId}, playerId: ${playerId}`);
     const saveMessage = {...msg, serverId, playerId};
     try{
@@ -58,7 +59,7 @@ natsClient.subscribeToGameServerServerIdEventsPlayerPlayerIdDisconnect((err, msg
         console.log(err);
         return;
     }
-    const persistentLogId = `PlayerDisconnected-${uuidv4}`;
+    const persistentLogId = `PlayerDisconnected-${uuidv4()}`;
     console.log(`${persistentLogId}: got message ${JSON.stringify(msg)}, with parameters serverId: ${serverId}, playerId: ${playerId}`);
     const saveMessage = {...msg, serverId, playerId};
     try{
@@ -80,7 +81,7 @@ natsClient.subscribeToGameServerServerIdEventsPlayerPlayerIdHit((err, msg, serve
         console.log(err);
         return;
     }
-    const persistentLogId = `PlayerHit-${uuidv4}`;
+    const persistentLogId = `PlayerHit-${uuidv4()}`;
     console.log(`${persistentLogId}: got message ${JSON.stringify(msg)}, with parameters serverId: ${serverId}, playerId: ${playerId}`);
     const saveMessage = {...msg, serverId, playerId};
     try{
@@ -102,7 +103,7 @@ natsClient.subscribeToGameServerServerIdEventsPlayerPlayerIdItemItemIdPickup((er
         console.log(err);
         return;
     }
-    const persistentLogId = `PlayerItemPickup-${uuidv4}`;
+    const persistentLogId = `PlayerItemPickup-${uuidv4()}`;
     console.log(`${persistentLogId}: got message ${JSON.stringify(msg)}, with parameters serverId: ${serverId}, playerId: ${playerId}, itemId: ${itemId}`);
     const saveMessage = {...msg, serverId, playerId, itemId};
     try{
