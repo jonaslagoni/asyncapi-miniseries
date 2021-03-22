@@ -1,0 +1,15 @@
+version: 3.8
+services:
+  mongodb:
+    image : mongo
+    volumes:
+      - mongodb_data_container:/data/db
+    ports:
+      - 27017:27017
+    restart: unless-stopped
+  nats:
+    image: nats
+    ports:
+      - 8222:8222
+volumes:
+  mongodb_data_container:

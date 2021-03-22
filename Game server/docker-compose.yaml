@@ -1,0 +1,6 @@
+version: 3.8
+services:
+  nats:
+    image: nats
+    ports:
+      - 8222:8222

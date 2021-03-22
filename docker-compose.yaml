@@ -1,0 +1,15 @@
+version: 3.8
+services:
+  mongodb:
+    image : mongo
+    volumes:
+      - mongodb_data_container:/data/db
+    restart: unless-stopped
+  nats:
+    image: nats
+  processor:
+    build: "./Processor"
+  game-server:
+    build: "./Game server"
+volumes:
+  mongodb_data_container:
