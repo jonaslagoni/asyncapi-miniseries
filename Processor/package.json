@@ -6,7 +6,8 @@
     "run": "node index.js"
   },
   "dependencies": {
-    "GeneratedClient": "file:./GeneratedClient"
+    "GeneratedClient": "file:./GeneratedClient",
+    "mongodb": "^3.6.5"
   },
   "author": "Jonas Lagoni (jonas-lt@live.dk)"
 }
