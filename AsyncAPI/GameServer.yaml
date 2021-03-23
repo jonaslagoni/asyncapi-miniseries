@@ -11,11 +11,11 @@ channels:
     description: Channel used when a player picks up an item in-game
     parameters:
       serverId: 
-        $ref: "./components/Parameters.yaml#serverId"
+        $ref: "./components/Parameters.yaml#/serverId"
       playerId: 
-        $ref: "./components/Parameters.yaml#playerId"
+        $ref: "./components/Parameters.yaml#/playerId"
       itemId: 
-        $ref: "./components/Parameters.yaml#itemId"
+        $ref: "./components/Parameters.yaml#/itemId"
     subscribe: 
       message:
         $ref: './components/messages/PlayerItemPickup.yaml'
@@ -23,9 +23,9 @@ channels:
     description: Channel used when a player joins (connect to) the game server
     parameters:
       serverId: 
-        $ref: "./components/Parameters.yaml#serverId"
+        $ref: "./components/Parameters.yaml#/serverId"
       playerId: 
-        $ref: "./components/Parameters.yaml#playerId"
+        $ref: "./components/Parameters.yaml#/playerId"
     subscribe: 
       message:
         $ref: './components/messages/PlayerConnected.yaml'
@@ -33,9 +33,9 @@ channels:
     description: Channel used when a player leaves (disconnects from) the game server
     parameters:
       serverId: 
-        $ref: "./components/Parameters.yaml#serverId"
+        $ref: "./components/Parameters.yaml#/serverId"
       playerId: 
-        $ref: "./components/Parameters.yaml#playerId"
+        $ref: "./components/Parameters.yaml#/playerId"
     subscribe: 
       message:
         $ref: './components/messages/PlayerDisconnected.yaml'
@@ -43,9 +43,9 @@ channels:
     description: Channel used when a player writes something in chat
     parameters:
       serverId: 
-        $ref: "./components/Parameters.yaml#serverId"
+        $ref: "./components/Parameters.yaml#/serverId"
       playerId: 
-        $ref: "./components/Parameters.yaml#playerId"
+        $ref: "./components/Parameters.yaml#/playerId"
     subscribe: 
       message:
         $ref: './components/messages/PlayerUsedChat.yaml'
@@ -53,9 +53,9 @@ channels:
     description: Channel used when a player hit another player in-game
     parameters:
       serverId: 
-        $ref: "./components/Parameters.yaml#serverId"
+        $ref: "./components/Parameters.yaml#/serverId"
       playerId: 
-        $ref: "./components/Parameters.yaml#playerId"
+        $ref: "./components/Parameters.yaml#/playerId"
     subscribe: 
       message:
         $ref: './components/messages/PlayerHit.yaml'
