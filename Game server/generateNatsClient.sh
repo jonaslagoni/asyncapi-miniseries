@@ -1,2 +1,0 @@
-#/bin/bash
-ag --output "./GeneratedClient" "../AsyncAPI/GameServer.yaml" @asyncapi/ts-nats-template --force-write --param "generateTestClient=true" --param "promisifyReplyCallback=true" && cd ./GeneratedClient && npm i && npm run build && cd ..
