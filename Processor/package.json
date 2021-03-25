@@ -4,10 +4,11 @@
   "description": "",
   "scripts": {
     "start": "node index.js",
-    "setup:database": "node setupDatabase.js"
+    "setup:database": "node setupDatabase.js",
+    "generate:client": "ag \"../AsyncAPI/Processor.yaml\" @asyncapi/ts-nats-template --install --force-write --output \"./GeneratedNatsClient\" && cd ./GeneratedNatsClient && npm i && npm run build && cd .."
   },
   "dependencies": {
-    "GeneratedClient": "file:./GeneratedClient",
+    "NatsClient": "file:GeneratedNatsClient",
     "mongodb": "^3.6.5",
     "uuid": "^8.3.2"
   },

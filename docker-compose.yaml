@@ -1,4 +1,4 @@
-version: 3.8
+version: "3.8"
 services:
   mongodb:
     image : mongo
@@ -11,5 +11,6 @@ services:
     image: nats
     ports:
       - 8222:8222
+    restart: unless-stopped
 volumes:
   mongodb_data_container:

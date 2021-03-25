@@ -1,7 +1,6 @@
 const { v4: uuidv4 } = require('uuid');
 const { NatsAsyncApiClient } = require('NatsClient');
 var client = new NatsAsyncApiClient();
-client.connectToHost("localhost:4222");
 const generateRandomNumber = (min, max) =>  {
 	return Math.floor(Math.random() * (max - min) + min);
 };
@@ -14,6 +13,12 @@ const getPlayerId = (playerCount) =>  {
 const intervalNewPlayersJoin = generateRandomNumber(100, 5000);
 let playerCounter = 1;
 const serverId = uuidv4();
+
+async function start() {
+	await client.connectToHost("localhost:4222");
+	//Simulate players join the game server
+	setInterval(simulateNewPlayer, intervalNewPlayersJoin); 
+}
 
 async function simulateNewPlayer(){
 	const playerId = getPlayerId(playerCounter++);
@@ -120,5 +125,4 @@ function simulatePlayerChat(playerDisconnected, playerId) {
 	}, chatIntervalTimeout);
 }
 
-//Simulate players join the game server
-setInterval(simulateNewPlayer, intervalNewPlayersJoin); 
+start().catch(e => {console.error(e)});
