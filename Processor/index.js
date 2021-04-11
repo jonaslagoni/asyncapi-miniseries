@@ -1,10 +1,68 @@
 
-const {NatsAsyncApiClient} = require('NatsClient');
+const {NatsAsyncApiClient, AvailableEvents} = require('NatsClient');
 const { v4: uuidv4 } = require('uuid');
 const MongoClient = require('mongodb').MongoClient;
 const Config = require('./config');
-var mongodbUrl = `mongodb://${Config.mongodbHost}`;
+var mongodbUrl = `mongodb://${Config.mongodbUsername}:${Config.mongodbPassword}@${Config.mongodbHost}`;
 const natsClient = new NatsAsyncApiClient();
+
+natsClient.on(AvailableEvents.permissionError, (e) => {
+	console.log('NatsAsyncApiClient permissionError');
+	console.log(e);
+});
+natsClient.on(AvailableEvents.close, (e) => {
+	console.log('NatsAsyncApiClient close');
+	console.log(e);
+});
+natsClient.on(AvailableEvents.connect, async (connection, serverURL, info) => {
+	console.log('NatsAsyncApiTestClient connect');
+	console.log({ connection, serverURL, info });
+});
+natsClient.on(AvailableEvents.connect, (connection, serverURL, info) => {
+	console.log('NatsAsyncApiClient connect');
+	console.log({ connection, serverURL, info });
+});
+natsClient.on(AvailableEvents.connecting, (serverURL) => {
+	console.log('NatsAsyncApiClient connecting');
+	console.log(serverURL);
+});
+natsClient.on(AvailableEvents.disconnect, (serverURL) => {
+	console.log('NatsAsyncApiClient disconnect');
+	console.log(serverURL);
+});
+natsClient.on(AvailableEvents.error, (e) => {
+	console.log('NatsAsyncApiClient error');
+	console.log(e);
+});
+natsClient.on(AvailableEvents.pingcount, () => {
+	console.log('NatsAsyncApiClient pingcount');
+});
+natsClient.on(AvailableEvents.pingtimer, () => {
+	console.log('NatsAsyncApiClient pingtimer');
+});
+natsClient.on(AvailableEvents.reconnect, (connection, serverURL, info) => {
+	console.log('NatsAsyncApiClient reconnect');
+	console.log({ connection, serverURL, info });
+});
+natsClient.on(AvailableEvents.reconnecting, (serverURL) => {
+	console.log('NatsAsyncApiClient reconnecting');
+	console.log(serverURL);
+});
+natsClient.on(AvailableEvents.serversChanged, (e) => {
+	console.log('NatsAsyncApiClient serversChanged');
+	console.log(e);
+});
+natsClient.on(AvailableEvents.subscribe, (e) => {
+	console.log('NatsAsyncApiClient subscribe');
+	console.log(e);
+});
+natsClient.on(AvailableEvents.unsubscribe, (e) => {
+	console.log('NatsAsyncApiClient unsubscribe');
+	console.log(e);
+});
+natsClient.on(AvailableEvents.yield, () => {
+	console.log('NatsAsyncApiClient yield');
+});
 async function start(){
     await natsClient.connectToHost(Config.natsHost);
 
@@ -26,7 +84,7 @@ async function start(){
             db.close();
             console.log(`${persistentLogId}: Saved to the database`);
         }catch(e){
-            console.error(`${persistentLogId}: Could not insert chat message`);
+            console.error(`${persistentLogId}: Could not insert chat message: ${e}`);
         }
     }, "*", "*"); 
     
@@ -48,7 +106,7 @@ async function start(){
             db.close();
             console.log(`${persistentLogId}: Saved to the database`);
         }catch(e){
-            console.error(`${persistentLogId}: Could not insert chat message`);
+            console.error(`${persistentLogId}: Could not insert chat message: ${e}`);
         }
     }, "*", "*");
     
@@ -70,7 +128,7 @@ async function start(){
             db.close();
             console.log(`${persistentLogId}: Saved to the database`);
         }catch(e){
-            console.error(`${persistentLogId}: Could not insert chat message`);
+            console.error(`${persistentLogId}: Could not insert chat message: ${e}`);
         }
     }, "*", "*");
     
@@ -92,7 +150,7 @@ async function start(){
             db.close();
             console.log(`${persistentLogId}: Saved to the database`);
         }catch(e){
-            console.error(`${persistentLogId}: Could not insert chat message`);
+            console.error(`${persistentLogId}: Could not insert chat message: ${e}`);
         }
     }, "*", "*");
     
@@ -110,11 +168,11 @@ async function start(){
         try{
             const db = await MongoClient.connect(mongodbUrl);
             var dbo = db.db(Config.mongodbDatabase);
-            await dbo.collection(Config.mongodbDisconnectsCollection).insertOne(saveMessage);
+            await dbo.collection(Config.mongodbItemPickupCollection).insertOne(saveMessage);
             db.close();
             console.log(`${persistentLogId}: Saved to the database`);
         }catch(e){
-            console.error(`${persistentLogId}: Could not insert chat message`);
+            console.error(`${persistentLogId}: Could not insert chat message: ${e}`);
         }
     }, "*", "*", "*");
     
