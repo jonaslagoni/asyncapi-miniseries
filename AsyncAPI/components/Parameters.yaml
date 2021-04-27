@@ -9,4 +9,4 @@ playerId:
 itemId:
   description: The id of item
   schema: 
-    type: integer
+    type: string

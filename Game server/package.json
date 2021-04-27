@@ -1,0 +1,15 @@
+{
+  "name": "game-server",
+  "version": "0.0.1",
+  "description": "",
+  "scripts": {
+    "start": "node index.js",
+    "generate:client": "ag \"../AsyncAPI/GameServer.yaml\" @asyncapi/ts-nats-template --install --force-write --output \"./GeneratedNatsClient\" && cd ./GeneratedNatsClient && npm i && npm run build && cd .."
+  },
+  "author": "Jonas Lagoni (jonas-lt@live.dk)",
+  "license": "Apache 2.0",
+  "dependencies": {
+    "NatsClient": "file:GeneratedNatsClient",
+    "uuid": "^8.3.2"
+  }
+}
