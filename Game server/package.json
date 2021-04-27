@@ -4,12 +4,15 @@
   "description": "",
   "scripts": {
     "start": "node index.js",
-    "generate:client": "ag \"../AsyncAPI/GameServer.yaml\" @asyncapi/ts-nats-template --install --force-write --output \"./GeneratedNatsClient\" && cd ./GeneratedNatsClient && npm i && npm run build && cd .."
+    "generate:client": "./node_modules/.bin/ag \"../AsyncAPI/GameServer.yaml\" @asyncapi/ts-nats-template --install --force-write --output \"./GeneratedNatsClient\" && cd ./GeneratedNatsClient && npm i && npm run build && cd .."
   },
-  "author": "Jonas Lagoni (jonas-lt@live.dk)",
-  "license": "Apache 2.0",
   "dependencies": {
     "NatsClient": "file:GeneratedNatsClient",
     "uuid": "^8.3.2"
-  }
+  },
+  "devDependencies": {
+    "@asyncapi/generator": "1.6.13"
+  },
+  "author": "Jonas Lagoni (jonas-lt@live.dk)",
+  "license": "Apache 2.0"
 }

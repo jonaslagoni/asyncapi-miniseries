@@ -4,12 +4,16 @@
   "description": "",
   "scripts": {
     "start": "node index.js",
-    "generate:client": "ag \"../AsyncAPI/Processor.yaml\" @asyncapi/ts-nats-template --install --force-write --output \"./GeneratedNatsClient\" && cd ./GeneratedNatsClient && npm i && npm run build && cd .."
+    "generate:client": "./node_modules/.bin/ag \"../AsyncAPI/Processor.yaml\" @asyncapi/ts-nats-template --install --force-write --output \"./GeneratedNatsClient\" && cd ./GeneratedNatsClient && npm i && npm run build && cd .."
   },
   "dependencies": {
     "mongodb": "^3.6.5",
     "NatsClient": "file:GeneratedNatsClient",
     "uuid": "^8.3.2"
   },
-  "author": "Jonas Lagoni (jonas-lt@live.dk)"
+  "devDependencies": {
+    "@asyncapi/generator": "1.6.13"
+  },
+  "author": "Jonas Lagoni (jonas-lt@live.dk)",
+  "license": "Apache 2.0"
 }

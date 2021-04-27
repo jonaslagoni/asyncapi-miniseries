@@ -9,6 +9,12 @@ Directory setup:
 - `./docs` - contains all the corresponding blog posts.
 
 ## Quick start local development
+Here is the steps to get the applications running.
+### Requirements
+The following libraries must be installed:
+* Node.js
+* npm 
+* Docker
 
 ### Services
 
