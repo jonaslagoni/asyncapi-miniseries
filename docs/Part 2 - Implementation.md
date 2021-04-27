@@ -26,19 +26,24 @@ The source code for the entire project can be found [here](https://github.com/jo
 
 **Don't see this blog post series as anything other then an example workflow, this is purely how I do it with my applications and how I use the specification and tooling to my advantage. Use this as an inspiration to finding an approach that works for you.**
 
+In the stack I will be using [NodeJS](https://nodejs.org/en/), [Docker](https://www.docker.com/) + [swarm](https://docs.docker.com/engine/swarm/), [MongoDB](https://www.mongodb.com/) and I will be using [NATS](https://nats.io/) as the message broker. You do not have to know specifically how the technologies works since I will be explaining it along the way.
+
+The tools I will be using are [JMeter](https://jmeter.apache.org/) for performance testing and [the AsyncAPI generator](https://github.com/asyncapi/generator) to generate code from the AsyncAPI documents. To generate code, the AsyncAPI generator needs to be used together with templates, and the two templates I am gonna use are [TypeScript/Node.js NATS](https://github.com/asyncapi/ts-nats-template) for the broker communication and [JMeter template](https://github.com/jonaslagoni/JMeter-template) for generating test plans for performance testing in part 5.
 # Implementing the applications using code generation
 
 Now that the AsyncAPI documents have been defined we wish to use those documents to generate some code for us which should simplify our development process (otherwise this blog post is kinda waste of time :smile:).
 
-For both applications I will be using the [TypeScript/Node.js NATS template](https://github.com/asyncapi/ts-nats-template) to generate a wrapper for communicating with the NATS broker. Anything I show you beyond this point is specific for this template alone, don't expect other templates to offer the same features or setup, each template is unique in its own ways. Would it be an idea to unify official templates :thinking:?
+For both applications I will be using the [TypeScript/Node.js NATS template](https://github.com/asyncapi/ts-nats-template) to generate a wrapper for communicating with the NATS broker. Anything I show you beyond this point is specific for this template alone, don't expect other templates to offer the same features or setup, each template is unique in its own ways. Side note: Would it be an idea to unify official broker templates to follow unified patterns :thinking:?
 
 Quick note, this template does not currently follow the specification directly since it can only generate code for the application it self, not for what the specification is designed for \[[1](#follow-specification)\].
 
-What does client wrapper really mean in this context? It means that the template generate all the functions and data models necessary for me to quickly say "publish to x channel with x payload", so all I need to focus on is the business logic itself.
+What does a "client wrapper" really mean in this context? It means that the template generates all the functions and data models necessary for me to quickly implement the use-case "publish this event with this payload and parameters", so all I need to focus on is the business logic of the applications.
+
+Notice: This implementation does not take into account 
 
 So what is the output of the generated code? With this template it gives me the following files:
 
-- A NATS client wrapper so I will be able to call 1 function which has all the necessary arguments based on the AsyncAPI definitions.
+- A NATS client wrapper so I will be able to call functions which has all the necessary arguments based on the AsyncAPI definitions.
 - Data models for the payload
 -
 
@@ -64,9 +69,11 @@ Next we generate the corresponding NATS client for the game server based on our 
 ag "../AsyncAPI/GameServer.yaml" @asyncapi/ts-nats-template --output "./GeneratedNatsClient"
 ```
 
-Where we use the AsyncAPI generator (`ag`) and tells it to use our AsyncAPI definition for the game server (`"../AsyncAPI/GameServer.yaml"`), and use the ts-nats-template as template (`@asyncapi/ts-nats-template`) and output the generated files to the folder `GeneratedNatsClient` (`--output "./GeneratedNatsClient"`).
+Where we use the AsyncAPI generator (`ag`) and tells it to use our AsyncAPI definition for the **game server** (`"../AsyncAPI/GameServer.yaml"`), and use the ts-nats-template (`@asyncapi/ts-nats-template`) and output the generated files to the folder `GeneratedNatsClient` (`--output "./GeneratedNatsClient"`).
 
-Once the client have been generated we need to install all it's dependencies and build it. We do so by changing directory into the output directory and running the command `npm i && npm run build`. We also add the generated client to the dependency list.
+Once the client have been generated, we need to install all it's dependencies and build it. We do so by changing directory into the output directory and running the command `npm i && npm run build`. 
+
+Next we add the generated client to the dependency list of the **game server**
 
 ```json
 ...
@@ -78,25 +85,32 @@ Once the client have been generated we need to install all it's dependencies and
 
 The business logic for the **game server** is simply simulating players joining, chatting, picking up items, hitting each other, and disconnecting. For this blog post the business logic really isn't that import so I will focus on the interaction with the generated client. If you are interested in the actual simulation implementation take a look [here]().
 
-The generated NATS client creates wrapper functions for each of our defined channels, the syntax for the generated functions are `<operation>To<Camel case Channel name>(<Message payload>, <parameter>)`. For our channel `game/server/{serverId}/events/player/{playerId}/connect` we get the function `publishToGameServerServerIdEventsPlayerPlayerIdConnect(<Message payload>, <serverId parameter>, <playerId parameter>)`
+The generated NATS client creates wrapper functions for each of our defined channels, using the syntax `<Operation type>To<Camel case channel name>(<Message payload object>, <Parameters>)`. For our channel `game/server/{serverId}/events/player/{playerId}/connect` we get the function `publishToGameServerServerIdEventsPlayerPlayerIdConnect(<Message payload>, <serverId parameter>, <playerId parameter>)`
 
-I will be keeping everything in one file for simplicity `index.js`. Which will at a random interval simulate new players join the server and perform the different actions.
+For the implementation I will be keeping everything in one file for simplicity `index.js`. Which will at a random interval simulate new players join the server and perform the different actions.
 
 ```js
 const { NatsAsyncApiClient } = require('NatsClient');
 var client = new NatsAsyncApiClient();
 let playerCounter = 1;
+const generateRandomNumber = (min, max) => {
+	return Math.floor(Math.random() * (max - min) + min);
+};
 const getIsoTimestamp = () => {
 	return new Date().toISOString();
 };
 const getNewPlayerId = () => {
 	return 'Player' + playerCount++;
 };
+const intervalNewPlayersJoin = generateRandomNumber(100, 5000);
+const serverId = uuidv4();
+const itemId = '1337';
 async function start() {
 	await client.connectToHost('0.0.0.0:4222');
 	//Simulate players join the game server each x ms
 	setInterval(simulateNewPlayer, intervalNewPlayersJoin);
 }
+const intervalNewPlayersJoin = generateRandomNumber(100, 5000);
 
 async function simulateNewPlayer() {
 	const playerId = getNewPlayerId();
@@ -114,8 +128,9 @@ async function simulateNewPlayer() {
 }
 start();
 ```
+First thing is to import the generated client (`NatsAsyncApiClient`) as a dependency and create a new client instance. We then define some basic functions `generateRandomNumber`, `getIsoTimestamp` and `getNewPlayerId` which is self explanatory. 
 
-`start` function connects the generated client to the NATS broker (`client.connectToHost`) and start the simulation by simulating a new player (`simulateNewPlayer`) each interval (`intervalNewPlayersJoin`). 
+The `start` function is then defined which connects the generated client to the NATS broker (`client.connectToHost`) and start the simulation, by simulating a new player (`simulateNewPlayer`) in a predefined interval (`intervalNewPlayersJoin`). 
 
 The generated client provides convenient wrapper functions to the channels such as `publishToGameServerServerIdEventsPlayerPlayerIdConnect` if we recall the AsyncAPI definition of the channel `game/server/{serverId}/events/player/{playerId}/connect`. Where we call the function with the message payload for the channel `joinMessage`, with the two parameters `serverId` and `playerId`. 
 
@@ -123,7 +138,7 @@ The generated client provides convenient wrapper functions to the channels such 
 
 The backend processor's job is to save all incoming events to the database (MongoDB).
 
-We go through all the same steps as for the game server for setting up the code generator, but instead of generating for the game server we provide the generator with our `Processor.yaml` file.
+We go through all the same steps as for the **game server** for generating code, but instead of generating for the **game server** we provide the generator with the backend processor's AsyncAPI document `Processor.yaml`.
 
 I will still focus on how the channel `game/server/{serverId}/events/player/{playerId}/item/{itemId}/pickup` is implemented.
 
@@ -158,20 +173,19 @@ await natsClient.subscribeToGameServerServerIdEventsPlayerPlayerIdItemItemIdPick
 );
 ```
 
-First argument to the function `subscribeToGame...Pickup` is the desired callback to call when the application receives new messages.
+First argument to the function `subscribeToGame...Pickup` is the desired callback to call when the application receives new messages on that specific channel.
 
 That callback got 5 arguments, `err` which is sat in case an error occurred while receiving the message. `msg` which is the message object, this of course have the correct model associated, so you know which properties are available. The 3 final arguments are the parameters for the channel. Since applications publishes to something like the following topic `game.server.server1.events.player.player1.item.item1.pickup` the received parameters will be `server1`, `player1` and `item1` respectfully. All that the callback is doing then is to insert it to the correct MongoDB collection.
 
 The final arguments to the `subscribe...` function is to define which `serverId`, `playerId` and `itemId` we want to subscribe to. In our case we want to subscribe to all (`*`) of them.
 
-As you can see, by using the generated clients we are able to quickly focus on the business logic, and 
+With this approach we can forget everything about having to define our own payload models, ensuring we send over the correct channels with the correct data.
 
 ## Next
-
-Now that we have our implementation created designed for our two applications we can move on to [Part 2: Implementing the applications using code generation.]()
+Now that we have the two applications implemented we can move on to [Part 3: Black-box testing the applications using code generation]().
 
 # Related issues
 
-In case you are interested in jumping into our discussions and be part of the community that drives the specification and tools, I have referenced some of the outstanding issues and discussions we have regarding the different aspects I have referenced in the post.
+In case you are interested in jumping into our discussions and be part of the community that drives the specification and tools, I have referenced some of the outstanding issues and discussions related to the different aspects I have referenced in the post.
 
 1. <a name="follow-specification"></a>[Template does not follow the specification](https://github.com/asyncapi/ts-nats-template/issues/87)

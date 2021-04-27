@@ -49,7 +49,7 @@ const getIsoTimestamp = () => {
 	return new Date().toISOString();
 };
 const getNewPlayerId = () => {
-	return 'Player' + playerCount++;
+	return 'Player' + playerCounter++;
 };
 const intervalNewPlayersJoin = generateRandomNumber(100, 5000);
 console.log(`New players are joining each ${intervalNewPlayersJoin} ms`);
@@ -115,7 +115,7 @@ function simulatePlayerHit(playerDisconnected, playerId) {
 					{
 						hitTimestamp: getIsoTimestamp(),
 						damage: generateRandomNumber(1, 100),
-						target: getPlayerId(generateRandomNumber(1, playerCounter)),
+						target: generateRandomNumber(1, playerCounter),
 					},
 					serverId,
 					playerId

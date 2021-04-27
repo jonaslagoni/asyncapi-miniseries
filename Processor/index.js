@@ -64,8 +64,7 @@ natsClient.on(AvailableEvents.yield, () => {
 	console.log('NatsAsyncApiClient yield');
 });
 async function start(){
-    await natsClient.connectToHost(Config.natsHost);
-
+    await natsClient.connectToHost(Config.natsHost, {reconnect: true, waitOnFirstConnect: true});
     /**
      * Subscribe to to all chat events regardless of which server and player it is from
      */
